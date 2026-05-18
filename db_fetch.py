@@ -1,0 +1,42 @@
+import pandas as pd
+from sqlalchemy import create_engine, text
+import os
+import logging 
+
+logger = logging.getLogger(__name__)
+
+class FetchData:
+    def __init__(self, db_url, db_name="Database"):
+        self.db_name = db_name
+        try:
+            logger.info(f"Initializing connection to {self.db_name}...")
+            self.engine = create_engine(db_url)
+        except Exception as e:
+            logger.error(f"Failed to initialize engine for {self.db_name}: {e}")
+            raise
+
+    def _read_sql_file(self, file_path):
+        if not os.path.exists(file_path):
+            raise FileNotFoundError(f"SQL file not found at: {file_path}")
+        with open(file_path, 'r') as file:
+            return file.read()
+
+    def fetch_from_file(self, sql_file_name, params=None):
+        logger.info(f"Preparing to run query from file: {sql_file_name}")
+        try:
+            raw_sql = self._read_sql_file(sql_file_name)
+            
+            logger.info(f"Executing query on {self.db_name}...")
+            with self.engine.connect() as connection:
+                result_df = pd.read_sql(text(raw_sql), connection, params=params)
+                
+            print(f"[{sql_file_name}] Successfully fetched {len(result_df)} rows.")
+            logger.info(f"SUCCESS: Fetched {len(result_df)} rows from {self.db_name}.")
+            return result_df
+            
+        except FileNotFoundError:
+            logger.error(f"FAILED: SQL file '{sql_file_name}' not found.")
+            return pd.DataFrame()
+        except Exception as e:
+            logger.error(f"FAILED: Error during {self.db_name} fetch: {e}")
+            return pd.DataFrame()

@@ -1,0 +1,30 @@
+FROM python:3.11-slim
+
+# 1. Install Linux tools and Postgres dependencies
+RUN apt-get update && apt-get install -y \
+    libpq-dev \
+    gcc \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# 2. SAP RFC SDK Setup (Only if not in base image)
+# You would put the 'nwrfcsdk' folder in your project root
+COPY ./nwrfcsdk /usr/local/sap/nwrfcsdk
+ENV SAPNWRFC_HOME=/usr/local/sap/nwrfcsdk
+ENV LD_LIBRARY_PATH=$SAPNWRFC_HOME/lib
+
+# 3. Standard Python installation
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# 4. Copy code
+COPY . .
+
+# 5. Security: Run as non-root user (Standard for K8s)
+RUN useradd -m myuser
+USER myuser
+
+# Use 'python' to start your script. 
+# Linux will recognize this as the correct command.
+CMD ["python", "main.py"]
