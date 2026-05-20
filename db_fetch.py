@@ -6,13 +6,22 @@ import logging
 logger = logging.getLogger(__name__)
 
 class FetchData:
-    def __init__(self, db_url, db_name="Database"):
+    def __init__(self, engine, db_name="Database"):
         self.db_name = db_name
         try:
             logger.info(f"Initializing connection to {self.db_name}...")
-            self.engine = create_engine(db_url)
+            
+            if engine is None:
+                raise ValueError("Engine object is None. Check your initialization() logic.")
+            
+            self.engine = engine 
+            
+            with self.engine.connect() as conn:
+                conn.execute(text("SELECT 1"))
+            logger.info(f"Connection to {self.db_name} successful.")
+            
         except Exception as e:
-            logger.error(f"Failed to initialize engine for {self.db_name}: {e}")
+            logger.error(f"Failed to connect to {self.db_name}: {e}")
             raise
 
     def _read_sql_file(self, file_path):

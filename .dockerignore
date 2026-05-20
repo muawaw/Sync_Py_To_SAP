@@ -1,0 +1,24 @@
+# Secrets and Config
+.env
+*.env
+.venv/
+env/
+
+# Version Control
+.git
+.gitignore
+
+# Python Junk
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Logs and Local Metadata
+*.log
+.vscode/
+.idea/
+
+# Docker/Build files
+Dockerfile
+.dockerignore

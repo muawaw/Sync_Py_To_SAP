@@ -1,0 +1,14 @@
+# --- Data & Database ---
+sqlalchemy==2.0.25
+psycopg2-binary==2.9.9
+pandas==2.2.0
+
+# --- Connectivity & Environment ---
+requests==2.31.0
+python-dotenv==1.0.1
+
+# --- Barcode & Image Processing ---
+# python-barcode provides the barcode logic
+python-barcode==0.15.1
+# Pillow is REQUIRED by ImageWriter to output BMP/PNG/JPG
+Pillow==10.2.0
