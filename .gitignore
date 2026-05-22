@@ -16,6 +16,10 @@ __pycache__/
 
 # query
 *posisi.sql
+<<<<<<< HEAD
 *pymt.sql
 
 *contoh data pymt.txt
+=======
+*pymt.sql
+>>>>>>> 9177ddb734d7ad0cd3a6731e46c01a98ae87e4cd

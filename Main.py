@@ -54,9 +54,12 @@ def start_sync():
     query_params = {"status_param": "READY"}
     pos_df = data1.fetch_from_file("posisi.sql", params=query_params)
 
+<<<<<<< HEAD
     pos_df['psabv'] = pos_df['psabv'].astype(str).str.strip()
     pos_df['pstxt'] = pos_df['pstxt'].astype(str).str.strip().str.upper()
 
+=======
+>>>>>>> 9177ddb734d7ad0cd3a6731e46c01a98ae87e4cd
     breakpoint()
 
     if pos_df.empty:
@@ -65,6 +68,7 @@ def start_sync():
     
     records_to_send = []
 
+<<<<<<< HEAD
     all_pymt_df = data1.fetch_from_file("pymt.sql")
     name_lookup = dict(zip(pos_df['pernr'].astype(str).str.strip(), pos_df['psabv']))
 
@@ -94,11 +98,44 @@ def start_sync():
         else:
             active_name = pos_name
             active_id   = pos_nik
+=======
+    for _, row in pos_df.iterrows():
+    
+        pos_nomenklatur = row['python_pos_id']      # NOMENKLATUR (MATCHING ZTABLE SAP)
+        pos_short_text  = row['python_short_text']  # DESK_KODE_REL (MATCHING ZTABLE SAP)
+        pos_long_text   = row['python_long_text']   # DESK_JABATAN (MATCHING ZTABLE SAP)
+        orig_id   = row['python_emp_id']   # maps to employee ID
+        orig_name = row['python_emp_name'] # maps to employee Name
+        pos_id    = row['python_pos_id']  # maps to Position ID
+
+        logger.info(f"Checking PYMT for: {orig_name}")
+        
+        pymt_df = FetchData.fetch_from_file(
+            "pymt.sql", #maps to PYMT history sql
+            params={"emp_id": orig_id}
+        )
+
+        if not pymt_df.empty:
+            leave_record = pymt_df.iloc[0]
+            
+            # [ACTION]: These names must match what your 2nd SQL file returns
+            active_name = leave_record['python_sub_name']
+            active_id   = leave_record['python_sub_id']
+            # Per your logic: KODE_PYMT should point to the substitute's role/link
+            pymt        = leave_record['python_sub_short_text'] 
+            begda       = leave_record['start_date']
+            endda       = leave_record['end_date']
+            is_sub      = True
+        else:
+            active_name = orig_name
+            active_id   = orig_id
+>>>>>>> 9177ddb734d7ad0cd3a6731e46c01a98ae87e4cd
             pymt        = ""
             begda       = "" 
             endda       = ""
             is_sub      = False
 
+<<<<<<< HEAD
         barcode_b64 = None
         if barcode_enabled:
             logger.info(f"Generating digital sign for {active_name}")
@@ -128,6 +165,37 @@ def start_sync():
         }
         records_to_send.append(z_record)
 
+=======
+    barcode_b64 = None
+    if barcode_enabled:
+        logger.info(f"Generating digital sign for {active_name}")
+    
+        sig_key = f"{pos_nomenklatur}_{active_id}"
+        barcode_b64 = barcode_gen.generate_barcode_as_base64(sig_key)
+        if barcode_b64:
+            logger.info(f"Barcode succesfully generated for {active_name}")
+        else:
+            logger.info(f"Failed to generate barcode for {active_name}")
+
+    z_record = {
+        "ID_PEJABAT": "",        # Let SAP handle numbering/auto-inc
+        "KODE_GROUP_PR": "",     # Optional
+        "KODE_GROUP": "",        # Optional
+        "KODE_RELEASE_PR": "",   # Optional
+        "KODE_RELEASE": "",      # Optional
+        "DESK_KODE_REL": pos_short_text,  
+        "NOMENKLATUR": pos_nomenklatur,
+        "DESK_JABATAN": pos_long_text,
+        "NAMA_PEJABAT": active_name,
+        "TANDA_TANGAN": barcode_b64,      # The Base64 BMP
+        "KODE_PYMT": pymt,          
+        "KODE_POSISI": "",       # Optional
+        "BEGDA": begda,
+        "ENDDA": endda
+    }
+        
+    records_to_send.append(z_record)
+>>>>>>> 9177ddb734d7ad0cd3a6731e46c01a98ae87e4cd
     logger.info(f"Prepared {len(records_to_send)} records for delivery.")
     
     try:
