@@ -1,0 +1,21 @@
+# Credentials
+.env
+
+# Python Virtual Environment
+venv/
+env/
+ENV/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# SAP Logs (if any)
+*.log
+
+# query
+*posisi.sql
+*pymt.sql
+
+*contoh data pymt.txt
