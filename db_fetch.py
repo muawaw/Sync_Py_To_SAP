@@ -34,17 +34,13 @@ class FetchData:
         logger.info(f"Preparing to run query from file: {sql_file_name}")
         try:
             raw_sql = self._read_sql_file(sql_file_name)
-<<<<<<< HEAD
 
-            breakpoint()
-=======
->>>>>>> 9177ddb734d7ad0cd3a6731e46c01a98ae87e4cd
+            # breakpoint()
             
             logger.info(f"Executing query on {self.db_name}...")
             with self.engine.connect() as connection:
                 result_df = pd.read_sql(text(raw_sql), connection, params=params)
                 
-<<<<<<< HEAD
             if result_df.empty:
                 emp_id = params.get('pernr') if isinstance(params, dict) else None
                 if emp_id:
@@ -57,10 +53,6 @@ class FetchData:
             else:
                 print(f"[{sql_file_name}] Successfully fetched {len(result_df)} rows.")
                 logger.info(f"SUCCESS: Fetched {len(result_df)} rows from {self.db_name}.")
-=======
-            print(f"[{sql_file_name}] Successfully fetched {len(result_df)} rows.")
-            logger.info(f"SUCCESS: Fetched {len(result_df)} rows from {self.db_name}.")
->>>>>>> 9177ddb734d7ad0cd3a6731e46c01a98ae87e4cd
             return result_df
             
         except FileNotFoundError:
